@@ -1,3 +1,4 @@
+import { EntityConfig } from 'custom-card-helpers';
 import { ActionConfig, LovelaceCard, LovelaceCardConfig, LovelaceCardEditor } from 'custom-card-helpers';
 
 declare global {
@@ -15,10 +16,19 @@ export interface PersonCardConfig extends LovelaceCardConfig {
   show_error?: boolean;
   test_gui?: boolean;
   person?: string;
+  banner_image_url?: string;
   phone_battery_sensor?: string;
   border_color?: string;
-  entities?: string[];
+  entities?: EntityConfig[];
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;
   double_tap_action?: ActionConfig;
+}
+
+export interface EntitiesEditorEvent {
+  detail?: {
+    entities?: EntityConfig[];
+    item?: any;
+  };
+  target?: EventTarget;
 }

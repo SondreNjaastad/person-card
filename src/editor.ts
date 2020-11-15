@@ -1,7 +1,10 @@
 import { LitElement, html, customElement, property, TemplateResult, CSSResult, css } from 'lit-element';
 import { HomeAssistant, fireEvent, LovelaceCardEditor, ActionConfig } from 'custom-card-helpers';
+import { processEditorEntities } from "./process-editor-entities";
 
-import { PersonCardConfig } from './types';
+import { EntitiesEditorEvent, PersonCardConfig } from './types';
+import { EntityConfig } from 'custom-card-helpers';
+import { internalProperty } from 'lit-element';
 
 const options = {
   required: {
@@ -51,9 +54,13 @@ export class PersonCardEditor extends LitElement implements LovelaceCardEditor {
   @property() private _toggle?: boolean;
   @property() private _helpers?: any;
   private _initialized = false;
+  @internalProperty() private _configEntities?: EntityConfig[];
 
   public setConfig(config: PersonCardConfig): void {
     this._config = config;
+    this._configEntities = config.entities
+      ? processEditorEntities(config.entities)
+      : [];
 
     this.loadCardHelpers();
   }
@@ -82,6 +89,14 @@ export class PersonCardEditor extends LitElement implements LovelaceCardEditor {
     return '';
   }
 
+  get _entities(): EntityConfig[] {
+    if (this._config) {
+      return this._config.entities || [];
+    }
+
+    return [];
+  }
+
   get _person(): string {
     if (this._config) {
       return this._config.person || '';
@@ -93,6 +108,14 @@ export class PersonCardEditor extends LitElement implements LovelaceCardEditor {
   get _phone_battery_sensor(): string {
     if (this._config) {
       return this._config.phone_battery_sensor || '';
+    }
+
+    return '';
+  }
+
+  get _banner_image_url(): string {
+    if (this._config) {
+      return this._config.banner_image_url || '';
     }
 
     return '';
@@ -138,6 +161,18 @@ export class PersonCardEditor extends LitElement implements LovelaceCardEditor {
     return { action: 'none' };
   }
 
+  private _entitiesValueChanged(ev: EntitiesEditorEvent): void {
+    if (!this._config || !this.hass) {
+      return;
+    }
+    if (ev.detail && ev.detail.entities) {
+      this._config = { ...this._config, entities: ev.detail.entities };
+
+      this._configEntities = processEditorEntities(this._config.entities);
+      fireEvent(this, "config-changed", { config: this._config });
+    }
+  }
+
   protected render(): TemplateResult | void {
     if (!this.hass || !this._helpers) {
       return html``;
@@ -162,34 +197,34 @@ export class PersonCardEditor extends LitElement implements LovelaceCardEditor {
         ${options.required.show
           ? html`
               <div class="values">
-                <paper-dropdown-menu
-                  label="Person (Required)"
-                  @value-changed=${this._valueChanged}
-                  .configValue=${'person'}
-                >
-                  <paper-listbox slot="dropdown-content" .selected=${people.indexOf(this._person)}>
-                    ${people.map(entity => {
-                      return html`
-                        <paper-item>${entity}</paper-item>
-                      `;
-                    })}
-                  </paper-listbox>
-                </paper-dropdown-menu>
+                <ha-entity-picker
+                .hass="${this.hass}"
+                label="Person"
+                .value="${this._person}"
+                .configValue=${"person"}
+                .includeDomains=${['person']}
+                @change="${this._valueChanged}"
+                allow-custom-entity
+                ></ha-entity-picker>
               </div>
               <div class="values">
-                <paper-dropdown-menu
-                  label="Device Battery (Required)"
-                  @value-changed=${this._valueChanged}
-                  .configValue=${'phone_battery_sensor'}
-                >
-                  <paper-listbox slot="dropdown-content" .selected=${sensors.indexOf(this._phone_battery_sensor)}>
-                    ${sensors.map(entity => {
-                      return html`
-                        <paper-item>${entity}</paper-item>
-                      `;
-                    })}
-                  </paper-listbox>
-                </paper-dropdown-menu>
+                <ha-entity-picker
+                    .hass="${this.hass}"
+                    label="Phone Battery Sensor"
+                    .value="${this._phone_battery_sensor}"
+                    .configValue=${"phone_battery_sensor"}
+                    .includeDomains=${['sensor']}
+                    @change="${this._valueChanged}"
+                    allow-custom-entity
+                ></ha-entity-picker>
+              </div>
+              <div class="values">
+                <paper-input
+                label="Banner image URL"
+                .value=${this._banner_image_url}
+                .configValue=${'banner_image_url'}
+                @value-changed=${this._valueChanged}
+                ></paper-input>
               </div>
             `
           : ''}
@@ -258,19 +293,22 @@ export class PersonCardEditor extends LitElement implements LovelaceCardEditor {
         ${options.optional.show
           ? html`
           <div class="values">
-          <paper-dropdown-menu
-            label="Image Border Color"
-            @value-changed=${this._valueChanged}
-            .configValue=${'border_color'}
-          >
-            <paper-listbox slot="dropdown-content" .selected=${sensors.indexOf(this._border_color)}>
-              ${sensors.map(entity => {
-                return html`
-                  <paper-item>${entity}</paper-item>
-                `;
-              })}
-            </paper-listbox>
-          </paper-dropdown-menu>
+            <ha-entity-picker
+                .hass="${this.hass}"
+                label="Person Border Color"
+                .value="${this._border_color}"
+                .configValue=${"border_color"}
+                .includedDomains=${['sensor']}
+                @change="${this._valueChanged}"
+                allow-custom-entity
+            ></ha-entity-picker>
+            <hui-entity-editor
+                .hass="${this.hass}"
+                .entities="${this._configEntities}"
+                label="Extra Entites"
+                @entities-changed="${this._entitiesValueChanged}"
+            >
+            </hui-entity-editor>
         </div>
             `
           : ''}

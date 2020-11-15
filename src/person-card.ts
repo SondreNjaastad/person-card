@@ -1,8 +1,7 @@
-  
+
 import { LitElement, html, customElement, property, CSSResult, TemplateResult, css, PropertyValues } from 'lit-element';
 import {
   HomeAssistant,
-  hasConfigOrEntityChanged,
   hasAction,
   ActionHandlerEvent,
   handleAction,
@@ -18,6 +17,8 @@ import { actionHandler } from './action-handler-directive';
 import { CARD_VERSION } from './const';
 
 import { localize } from './localize/localize';
+import { hasConfigOrEntityChanged } from './custom-should-update';
+import { EntityConfig } from 'custom-card-helpers';
 
 /* eslint no-console: 0 */
 console.info(
@@ -68,7 +69,6 @@ export class personCard extends LitElement {
     if (!this.config) {
       return false;
     }
-
     return hasConfigOrEntityChanged(this, changedProps, false);
   }
 
@@ -91,10 +91,6 @@ export class personCard extends LitElement {
     if(this.config.border_color !== undefined)
         borderColor = this.hass.states[this.config.border_color];
 
-    console.log(this.hass.states)
-
-    console.log(person);
-    
     return html`
       <ha-card
         @action=${this._handleAction}
@@ -106,7 +102,9 @@ export class personCard extends LitElement {
         .label=${`person: ${this.config.person || 'No Person Defined'}`}
       >
       <div class="card-body">
-        <div class="header-image"></div>
+        <div class="header-image"
+        style="background-image: url('${this.config.banner_image_url ? this.config.banner_image_url : ''}');"
+        ></div>
             <img
                 class="person-image"
                 style="border-color: ${borderColor ? borderColor.state : `white`};"
@@ -120,8 +118,8 @@ export class personCard extends LitElement {
                 ${person.attributes.friendly_name}
             </div>
             <div class="card-attributes">
-                ${this.config.entities?.map(ent => {
-                    const stateObj = this.hass.states[ent];
+                ${this.config.entities?.map((ent: EntityConfig) => {
+                    const stateObj = this.hass.states[ent.entity];
                     return stateObj
                         ? html`
                             <div class="card-attribute"><ha-icon .icon=${stateObj.attributes.icon ? stateObj.attributes.icon : `mdi:eye`}></ha-icon> ${stateObj.state}</div>
