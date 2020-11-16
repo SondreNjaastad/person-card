@@ -12,6 +12,15 @@ ha-icon {
   color: black;
 }
 
+.presence-indicator {
+  height: 25px;
+  width: 25px;
+  position: absolute;
+  margin-left: calc(50% + 20px);
+  margin-top: -30px;
+  border-radius: 50%;
+}
+
 .header-image {
   width: 100%;
   height: 110px;
@@ -25,6 +34,7 @@ ha-icon {
 .person-image {
   height: 80px;
   width: 80px;
+  border-color: white;
   border-radius: 50%;
   border-width: 5px;
   border-style: solid;

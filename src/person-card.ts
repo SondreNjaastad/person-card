@@ -107,9 +107,9 @@ export class personCard extends LitElement {
         ></div>
             <img
                 class="person-image"
-                style="border-color: ${borderColor ? borderColor.state : `white`};"
                 src="${person.attributes.entity_picture}"
                 />
+            <div class="presence-indicator" style="${borderColor ? 'background-color: ' + borderColor.state : `display: none`}"></div>
             <div class="location-and-battery">
                 <span class="location"><ha-icon .icon=${`mdi:map-marker`}></ha-icon> ${person.state}</span>
                 <span class="battery"><ha-icon .icon=${device.attributes.icon}></ha-icon> ${device.state}%</span>
