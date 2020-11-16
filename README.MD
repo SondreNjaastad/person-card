@@ -1,12 +1,12 @@
 # Person Card by [@Sondre Njåstad](https://www.github.com/SondreNjaastad)
-## Designed by [@Zack Barett](https://www.github.com/SondreNjaastad)
+## Designed by [@Zack Barett](https://www.github.com/zsarnett)
 A Person card to indicate location, phone battery life, presence status and any other sensor you want
 
 ## Support
 
 Hey dude! Help me out for a couple of :beers: or a :coffee:!
 
-[![coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://wwwbuymeacoffee.com/SondreNjaastad)
+[![coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://www.buymeacoffee.com/SondreNjaastad)
 
 ## Options
 
