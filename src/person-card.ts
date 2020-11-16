@@ -11,7 +11,7 @@ import {
 
 import './editor';
 
-import { PersonCardConfig } from './types';
+import { actionConfigStruct, entitiesConfigStruct, PersonCardConfig } from './types';
 import style from './style';
 import { actionHandler } from './action-handler-directive';
 import { CARD_VERSION } from './const';
@@ -19,6 +19,7 @@ import { CARD_VERSION } from './const';
 import { localize } from './localize/localize';
 import { hasConfigOrEntityChanged } from './custom-should-update';
 import { EntityConfig } from 'custom-card-helpers';
+import {  array, object, optional, string, assert } from 'superstruct';
 
 /* eslint no-console: 0 */
 console.info(
@@ -32,6 +33,18 @@ console.info(
   type: 'person-card',
   name: 'person Card',
   description: 'A template custom card for you to create something awesome',
+});
+
+const cardConfigStruct = object({
+  type: string(),
+  person: string(),
+  banner_image_url: optional(string()),
+  phone_battery_sensor: optional(string()),
+  presence_color: optional(string()),
+  entities: optional(array(entitiesConfigStruct)),
+  tap_action: optional(actionConfigStruct),
+  hold_action: optional(actionConfigStruct),
+  double_tap_action: optional(actionConfigStruct),
 });
 
 // TODO Name your custom element
@@ -51,9 +64,7 @@ export class personCard extends LitElement {
 
   public setConfig(config: PersonCardConfig): void {
     // TODO Check for required fields and that they are of the proper format
-    if (!config || config.show_error) {
-      throw new Error(localize('common.invalid_configuration'));
-    }
+    assert(config, cardConfigStruct);
 
     if (config.test_gui) {
       getLovelace().setEditMode(true);
@@ -73,11 +84,6 @@ export class personCard extends LitElement {
   }
 
   protected render(): TemplateResult | void {
-    // TODO Check for stateObj or other necessary things and render a warning if missing
-    if (this.config.show_warning) {
-      return this.showWarning(localize('common.show_warning'));
-    }
-
     var person;
     var device;
     var borderColor;
@@ -88,8 +94,8 @@ export class personCard extends LitElement {
     if(this.config.phone_battery_sensor !== undefined)
         device = this.hass.states[this.config.phone_battery_sensor];
     
-    if(this.config.border_color !== undefined)
-        borderColor = this.hass.states[this.config.border_color];
+    if(this.config.presence_color !== undefined)
+        borderColor = this.hass.states[this.config.presence_color];
 
     return html`
       <ha-card
@@ -112,7 +118,7 @@ export class personCard extends LitElement {
             <div class="presence-indicator" style="${borderColor ? 'background-color: ' + borderColor.state : `display: none`}"></div>
             <div class="location-and-battery">
                 <span class="location"><ha-icon .icon=${`mdi:map-marker`}></ha-icon> ${person.state}</span>
-                <span class="battery"><ha-icon .icon=${device.attributes.icon}></ha-icon> ${device.state}%</span>
+                <span class="battery">${device ? html`<ha-icon .icon=${device.attributes.icon}></ha-icon> ${device.state}%` : `` }</span>
             </div>
             <div class="name">
                 ${person.attributes.friendly_name}
@@ -136,25 +142,6 @@ export class personCard extends LitElement {
     if (this.hass && this.config && ev.detail.action) {
       handleAction(this, this.hass, this.config, ev.detail.action);
     }
-  }
-
-  private showWarning(warning: string): TemplateResult {
-    return html`
-      <hui-warning>${warning}</hui-warning>
-    `;
-  }
-
-  private showError(error: string): TemplateResult {
-    const errorCard = document.createElement('hui-error-card');
-    errorCard.setConfig({
-      type: 'error',
-      error,
-      origConfig: this.config,
-    });
-
-    return html`
-      ${errorCard}
-    `;
   }
 
   static get styles(): CSSResult {

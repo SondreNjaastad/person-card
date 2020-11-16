@@ -121,22 +121,6 @@ export class PersonCardEditor extends LitElement implements LovelaceCardEditor {
     return '';
   }
 
-  get _show_warning(): boolean {
-    if (this._config) {
-      return this._config.show_warning || false;
-    }
-
-    return false;
-  }
-
-  get _show_error(): boolean {
-    if (this._config) {
-      return this._config.show_error || false;
-    }
-
-    return false;
-  }
-
   get _tap_action(): ActionConfig {
     if (this._config) {
       return this._config.tap_action || { action: 'more-info' };
@@ -206,25 +190,6 @@ export class PersonCardEditor extends LitElement implements LovelaceCardEditor {
                 @change="${this._valueChanged}"
                 allow-custom-entity
                 ></ha-entity-picker>
-              </div>
-              <div class="values">
-                <ha-entity-picker
-                    .hass="${this.hass}"
-                    label="Phone Battery Sensor"
-                    .value="${this._phone_battery_sensor}"
-                    .configValue=${"phone_battery_sensor"}
-                    .includeDomains=${['sensor']}
-                    @change="${this._valueChanged}"
-                    allow-custom-entity
-                ></ha-entity-picker>
-              </div>
-              <div class="values">
-                <paper-input
-                label="Banner image URL"
-                .value=${this._banner_image_url}
-                .configValue=${'banner_image_url'}
-                @value-changed=${this._valueChanged}
-                ></paper-input>
               </div>
             `
           : ''}
@@ -302,6 +267,26 @@ export class PersonCardEditor extends LitElement implements LovelaceCardEditor {
                 @change="${this._valueChanged}"
                 allow-custom-entity
             ></ha-entity-picker>
+            </div>
+            <div class="values">
+            <ha-entity-picker
+                  .hass="${this.hass}"
+                  label="Phone Battery Sensor"
+                  .value="${this._phone_battery_sensor}"
+                  .configValue=${"phone_battery_sensor"}
+                  .includeDomains=${['sensor']}
+                  @change="${this._valueChanged}"
+                  allow-custom-entity
+              ></ha-entity-picker>
+            </div>
+            <div class="values">
+              <paper-input
+              label="Banner image URL"
+              .value=${this._banner_image_url}
+              .configValue=${'banner_image_url'}
+              @value-changed=${this._valueChanged}
+              ></paper-input>
+            </div>
             <hui-entity-editor
                 .hass="${this.hass}"
                 .entities="${this._configEntities}"
