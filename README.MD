@@ -1,6 +1,5 @@
 # Person Card by [@Sondre Njåstad](https://www.github.com/SondreNjaastad)
-
-Designed by [@Zack Barett](https://www.github.com/SondreNjaastad)
+## Designed by [@Zack Barett](https://www.github.com/SondreNjaastad)
 A Person card to indicate location, phone battery life, presence status and any other sensor you want
 
 ## Support
