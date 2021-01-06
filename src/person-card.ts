@@ -81,9 +81,13 @@ export class personCard extends LitElement {
     var person;
     var device;
     var borderColor;
+    var personState;
 
     if(this.config.person !== undefined)
         person = this.hass.states[this.config.person];
+
+    if(person) 
+      personState = person.state == 'home' ? 'Home' : "Away";
     
     if(this.config.phone_battery_sensor !== undefined)
         device = this.hass.states[this.config.phone_battery_sensor];
@@ -111,7 +115,7 @@ export class personCard extends LitElement {
                 />
             <div class="presence-indicator" style="${borderColor ? 'background-color: ' + borderColor.state : `display: none`}"></div>
             <div class="location-and-battery">
-                <span class="location"><ha-icon .icon=${`mdi:map-marker`}></ha-icon> ${person.state}</span>
+                <span class="location"><ha-icon .icon=${`mdi:map-marker`}></ha-icon> ${personState}</span>
                 <span class="battery"><ha-icon .icon=${device.attributes.icon}></ha-icon> ${device.state}%</span>
             </div>
             <div class="name">
